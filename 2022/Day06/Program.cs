@@ -1,38 +1,28 @@
 ﻿var path = "./input.prod";
 
-var packetMarker = 0;
-var packetMarkerReported = false;
-var messageMarker = 0;
-var messageMarkerReported = false;
+GetStartPosition(path, 4); // Part1: 1287
+GetStartPosition(path, 14); // Part2: 3716
 
-using (StreamReader reader = new StreamReader(path))
+void GetStartPosition (string path, int distinct)
 {
-    Queue<char> packetQueue = new Queue<char>();
-    Queue<char> messageQueue = new Queue<char>();
-
-    while (reader.Peek() >= 0)
+    using (StreamReader reader = new StreamReader(path))
     {
-        if (packetQueue.Count > 3) packetQueue.Dequeue();
-        if (messageQueue.Count > 13) messageQueue.Dequeue();
+        Queue<char> queue = new Queue<char>();
+        int index = 0;
 
-        var packet = (char)reader.Read();
-
-        packetQueue.Enqueue(packet);
-        messageQueue.Enqueue(packet);
-
-        packetMarker++;
-        messageMarker++;
-
-        if (packetQueue.Distinct().Count() == 4 && packetMarkerReported == false)
+        while (reader.Peek() >= 0)
         {
-            Console.WriteLine(packetMarker); // Part1: 1287
-            packetMarkerReported = true;
-        }
+            if (queue.Count > distinct-1) queue.Dequeue();
 
-        if (messageQueue.Distinct().Count() == 14 && messageMarkerReported == false)
-        {
-            Console.WriteLine(messageMarker); // Part2: 3716
-            messageMarkerReported = true;
+            queue.Enqueue((char)reader.Read());
+
+            index++;
+
+            if (queue.Distinct().Count() == distinct) 
+            {
+                Console.WriteLine($"Index : {index}");
+                break;
+            }
         }
     }
 }
