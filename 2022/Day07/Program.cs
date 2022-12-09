@@ -1,31 +1,20 @@
 ﻿var path = "./input.test";
-
-// stack for holding current position
 var position = new Stack<string>();
 
-// dictionary for holding dirs
 Dictionary<string, List<string>> folderContents = new Dictionary<string, List<string>>();
+Dictionary<string, int> contentSize = new Dictionary<string, int>();
 
-// parser to switch thru lines for command vs contents
 foreach (string line in File.ReadLines(path))
 {
     var (first, last) = SplitLines(line);
 
-    // command
     if (first == "$")
     {
         IssueCommmand(last);
-        break;
     }
-
-    // contents
-    if (first == "dir")
+    else 
     {
-        HandleContents(last);
-    }
-    else
-    {
-        HandleContents(first);
+        HandleContents(first, last);
     }
 }
 
@@ -34,10 +23,19 @@ foreach (KeyValuePair<string, List<string>> entry in folderContents)
     Console.WriteLine(entry.Key);
 }
 
+Console.WriteLine("-------");
+
+foreach (KeyValuePair<string, int> entry in contentSize)
+{
+    Console.WriteLine(entry.Key);
+    Console.WriteLine(entry.Value);
+}
+
 // walk dictionary - recursive summing of contents of dirs
 // look/sum other dir entries if required
 
-// line splitter, return first and last as tuple<string, string>
+// #################################################################################
+
 (string first, string last) SplitLines (string input)
 {
     var seperated = input.Split(' ');
@@ -45,11 +43,8 @@ foreach (KeyValuePair<string, List<string>> entry in folderContents)
     return (seperated.First(), seperated.Last());
 }
 
-// uses stack to hold directory position state
 void IssueCommmand (string command)
 {
-    Console.WriteLine(command);
-
     if (command == "..")
     {
         position.Pop();
@@ -60,21 +55,43 @@ void IssueCommmand (string command)
     {
         position.Push(command);
 
-        // add dir to dictionary here if not already exists
-        if (!folderContents.ContainsKey(command))
-        {
-            folderContents.Add(command, new List<string>());
-        }
-
-        return; 
+        HandleDirectoryFromCommand();
     }
 }
 
-//add to list in dict
-void HandleContents (string contents)
+void HandleDirectoryFromCommand ()
 {
-    if (folderContents.ContainsKey(contents))
+    var test = position.Peek();
+
+    if (!folderContents.ContainsKey(test))
     {
-        folderContents[position.Peek()].Add(contents);
+        folderContents.Add(test, new List<string>());
+    }
+
+    if (!contentSize.ContainsKey(test))
+    {
+        contentSize.Add(test, 0);
+    }
+}
+
+void HandleContents (string first, string last)
+{
+    var currentLocation = position.Peek();
+    
+    folderContents[currentLocation].Add(last);
+
+    if (first == "dir")
+    {
+        if (!contentSize.ContainsKey(last))
+        {
+            contentSize.Add(last, 0);
+        }
+    }
+    else
+    {
+        if (!contentSize.ContainsKey(last))
+        {
+            contentSize.Add(last, Int32.Parse(first));
+        }
     }
 }
