@@ -1,7 +1,8 @@
 ﻿var path = "./input.prod";
 
-HashSet<Content> items = new (); 
+List<Content> allItems = new ();
 Stack<Content> currentPath = new ();
+currentPath.Push(new Content("/"));
 
 foreach (string line in File.ReadLines(path))
 {
@@ -13,26 +14,27 @@ foreach (string line in File.ReadLines(path))
     }
     else if (first == "dir")
     {
-        var temp = new Content(last);
-        items.Add(temp);
-        currentPath.Peek().AddChild(temp);
+        var tempFolder = new Content(last);
+        allItems.Add(tempFolder);
+        currentPath.Peek().AddChild(tempFolder);
     }
     else
     {
-        currentPath.Peek().AddChild(new Content(last, first));
+        var tempFile = new Content(last, first);
+        currentPath.Peek().AddChild(tempFile);
     }
 }
 
 var sum = 0;
 
-foreach (Content item in items)
+foreach (Content item in allItems)
 {
     int total = item.GetSize();
 
     if (total <= 100000) sum += total;
 }
 
-Console.WriteLine($"Sum : {sum}"); //774902 = too low - duplicate folder names causing issues as handled as unique in hash set
+Console.WriteLine($"Sum : {sum}"); //test 95437 : prod 1501149
 
 // ================================
 
@@ -47,6 +49,8 @@ void Command (string line)
 {
     var (first, last) = SplitLines(line);
 
+    if (last == "/") return;
+
     if (last == "..")
     {
         currentPath.Pop();
@@ -55,17 +59,8 @@ void Command (string line)
 
     if (line.Split(' ').Length > 2)
     {    
-        Content? existing = items.Where(x => x.name.Equals(last)).FirstOrDefault();
+        Content? existing = currentPath.Peek().children.Where(x => x.name.Equals(last)).FirstOrDefault();
 
-        if (existing is null)
-        {
-            var temp = new Content(last);
-            items.Add(temp);
-            currentPath.Push(temp);
-        }
-        else
-        {
-            currentPath.Push(existing);
-        }
+        currentPath.Push(existing);
     }
 }
