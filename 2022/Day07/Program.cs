@@ -1,8 +1,7 @@
-﻿var path = "./input.test";
-var position = new Stack<string>();
+﻿var path = "./input.prod";
 
-Dictionary<string, List<string>> folderContents = new Dictionary<string, List<string>>();
-Dictionary<string, int> contentSize = new Dictionary<string, int>();
+HashSet<Content> items = new (); 
+Stack<Content> currentPath = new ();
 
 foreach (string line in File.ReadLines(path))
 {
@@ -10,31 +9,32 @@ foreach (string line in File.ReadLines(path))
 
     if (first == "$")
     {
-        IssueCommmand(last);
+        Command(line);
     }
-    else 
+    else if (first == "dir")
     {
-        HandleContents(first, last);
+        var temp = new Content(last);
+        items.Add(temp);
+        currentPath.Peek().AddChild(temp);
+    }
+    else
+    {
+        currentPath.Peek().AddChild(new Content(last, first));
     }
 }
 
-foreach (KeyValuePair<string, List<string>> entry in folderContents)
+var sum = 0;
+
+foreach (Content item in items)
 {
-    Console.WriteLine(entry.Key);
+    int total = item.GetSize();
+
+    if (total <= 100000) sum += total;
 }
 
-Console.WriteLine("-------");
+Console.WriteLine($"Sum : {sum}"); //774902 = too low - duplicate folder names causing issues as handled as unique in hash set
 
-foreach (KeyValuePair<string, int> entry in contentSize)
-{
-    Console.WriteLine(entry.Key);
-    Console.WriteLine(entry.Value);
-}
-
-// walk dictionary - recursive summing of contents of dirs
-// look/sum other dir entries if required
-
-// #################################################################################
+// ================================
 
 (string first, string last) SplitLines (string input)
 {
@@ -43,55 +43,29 @@ foreach (KeyValuePair<string, int> entry in contentSize)
     return (seperated.First(), seperated.Last());
 }
 
-void IssueCommmand (string command)
+void Command (string line)
 {
-    if (command == "..")
+    var (first, last) = SplitLines(line);
+
+    if (last == "..")
     {
-        position.Pop();
+        currentPath.Pop();
         return;
     }
 
-    if (command != "ls") // hack: does not allow for folder named "ls"
-    {
-        position.Push(command);
+    if (line.Split(' ').Length > 2)
+    {    
+        Content? existing = items.Where(x => x.name.Equals(last)).FirstOrDefault();
 
-        HandleDirectoryFromCommand();
-    }
-}
-
-void HandleDirectoryFromCommand ()
-{
-    var test = position.Peek();
-
-    if (!folderContents.ContainsKey(test))
-    {
-        folderContents.Add(test, new List<string>());
-    }
-
-    if (!contentSize.ContainsKey(test))
-    {
-        contentSize.Add(test, 0);
-    }
-}
-
-void HandleContents (string first, string last)
-{
-    var currentLocation = position.Peek();
-    
-    folderContents[currentLocation].Add(last);
-
-    if (first == "dir")
-    {
-        if (!contentSize.ContainsKey(last))
+        if (existing is null)
         {
-            contentSize.Add(last, 0);
+            var temp = new Content(last);
+            items.Add(temp);
+            currentPath.Push(temp);
         }
-    }
-    else
-    {
-        if (!contentSize.ContainsKey(last))
+        else
         {
-            contentSize.Add(last, Int32.Parse(first));
+            currentPath.Push(existing);
         }
     }
 }
