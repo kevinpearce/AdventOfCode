@@ -2,7 +2,8 @@
 
 List<Content> allItems = new ();
 Stack<Content> currentPath = new ();
-currentPath.Push(new Content("/"));
+var homeDirectory = new Content("/");
+currentPath.Push(homeDirectory);
 
 foreach (string line in File.ReadLines(path))
 {
@@ -34,7 +35,25 @@ foreach (Content item in allItems)
     if (total <= 100000) sum += total;
 }
 
-Console.WriteLine($"Sum : {sum}"); //test 95437 : prod 1501149
+Console.WriteLine($"Part1 : {sum}"); //test 95437 : prod 1501149
+
+// ================================
+
+List<Content> ordered = OrderListBySize();
+int totalSize = homeDirectory.GetSize();
+
+for (int i = 0; i < ordered.Count(); i++)
+{
+    int current = 0;
+
+    if ((totalSize - ordered[i].GetSize()) < 40000000) 
+    {
+        Console.WriteLine(ordered[i].GetSize()); //Part2 : 10096985
+        break;
+    }
+
+    current = i;
+}
 
 // ================================
 
@@ -63,4 +82,11 @@ void Command (string line)
 
         currentPath.Push(existing);
     }
+}
+
+List<Content> OrderListBySize ()
+{
+    List<Content> sortedList = allItems.OrderBy(o => o.GetSize()).ToList();
+
+    return sortedList;
 }
