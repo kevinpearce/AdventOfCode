@@ -7,4 +7,16 @@ Rope instance = new();
 //     instance.Move(line);
 // }
 
-// instance.tail.GetSumOfUniquePositionsVisited(); // update for last position in list? hide logic behind public method on rope?
+// Console.WriteLine(instance.ropeNodes.Last().GetSumOfUniquePositionsVisited());
+
+
+
+
+// ################# testing rubbish below ########################
+string test = "R 4";
+
+instance.Move(test);
+
+Console.WriteLine(instance.ropeNodes.First().GetSumOfUniquePositionsVisited());
+Console.WriteLine(instance.ropeNodes.First().GetPosition());
+Console.WriteLine(instance.ropeNodes.Last().GetPosition());

@@ -8,7 +8,8 @@ class Node
     {
         positionX = 0;
         positionY = 0;
-        uniquePositionsVisited.Add(Tuple.Create<int, int>(positionX, positionY));
+
+        UpdateUniquePositionsVisited();
     }
 
     public int GetSumOfUniquePositionsVisited ()
@@ -16,11 +17,21 @@ class Node
         return uniquePositionsVisited.Count;
     }
 
-    // public void UpdatePosition (?)
-    // {
-    // }
+    public void UpdatePosition (Tuple<int, int> input)
+    {
+        positionX += input.Item1;
+        positionY += input.Item2;
 
-    // public ? GetPosition ()
-    // {
-    // }
+        UpdateUniquePositionsVisited();
+    }
+
+    public Tuple<int, int> GetPosition ()
+    {
+        return (Tuple.Create<int, int>(positionX, positionY));
+    }
+
+    private void UpdateUniquePositionsVisited ()
+    {
+        uniquePositionsVisited.Add(Tuple.Create<int, int>(positionX, positionY));
+    }
 }
