@@ -17,10 +17,10 @@ class Node
         return uniquePositionsVisited.Count;
     }
 
-    public void UpdatePosition (Tuple<int, int> input)
+    public void UpdatePosition (int xInput, int yInput)
     {
-        positionX += input.Item1;
-        positionY += input.Item2;
+        positionX += xInput;
+        positionY += yInput;
 
         UpdateUniquePositionsVisited();
     }

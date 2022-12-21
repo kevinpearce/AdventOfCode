@@ -11,16 +11,34 @@ class Rope
     {
         Tuple<int, int> command = ParseCommand(input);
 
-        ropeNodes.First().UpdatePosition(command);
+        // move in X direction
+        if (command.Item2 == 0)
+        {
+            for (int i = 1; i <= command.Item1; i++)
+            {
+                // MoveHead
+                ropeNodes.First().UpdatePosition(i, 0);
 
-        if (ropeNodes.Count > 1) UpdateOtherNodes();
+                // UpdateOtherNodes
+
+            }
+        }
+
+        // move in Y direction
+        // if (command.Item1 == 0)
+        // {
+            
+        // }
     }
 
     private void UpdateOtherNodes ()
     {
         // WIP : needs work - swap to recursive call ??
-        // Needs to walk list, clipping item[0] each time
-        // then for each element needs while diff > 1 => move and repeat
+
+        // walk through list of nodes
+        // check rules to see if current node needs moving
+        // move node if required
+        // repeat until all nodes have been checked/updated
         
         for (int i = 1; i < ropeNodes.Count; i++)
         {
